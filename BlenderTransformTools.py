@@ -445,6 +445,73 @@ class BOAlinharADoisObjetos(bpy.types.Operator):
         
         return {'FINISHED'}
 
+class BOAlinharOrigemASeleção(bpy.types.Operator):
+    """Alinha a origem do objeto a seleção"""
+    bl_idname = "potato.10"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('---------- CÓDIGO INICIA AQUI - BOAlinharOrigemASeleção ----------')
+
+        # Posição original do cursor
+        cursor = bpy.context.scene.cursor
+        cursorLoc = mathutils.Vector(cursor.location)
+
+        # Pega todos os objetos na seleção
+        selection = bpy.context.selected_objects
+
+        # Pega o objeto ativo
+        active_object = bpy.context.active_object
+
+        # Ativa o modo de edição, ambos métodos funcionam
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        # Move o cursor para a seleção
+        bpy.ops.view3d.snap_cursor_to_selected()
+
+        # Sai do modo de ediçao, ambos métodos funcionam
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        # Define a origem para o cursor
+        bpy.ops.object.origin_set(
+            type='ORIGIN_CURSOR', center='BOUNDS')
+        
+        # Reseta o cursor para a posição original
+        cursor.location = cursorLoc
+
+        return {'FINISHED'}
+
+class BOALinharElementoAOutro(bpy.types.Operator):
+    """Alinha a origem do objeto a origem de outro objeto"""
+    bl_idname = "potato.11"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('---------- CÓDIGO INICIA AQUI - BOALinharElementoAOutro ----------')
+
+        # Posição original do cursor
+        cursor = bpy.context.scene.cursor
+        cursorLoc = mathutils.Vector(cursor.location)
+
+        # Pega todos os objetos na seleção
+        selection = bpy.context.selected_objects
+
+        # Pega o objeto ativo
+        active_object = bpy.context.active_object
+
+        # Reseta o cursor para a posição original
+        cursor.location = cursorLoc
+
+        if len(selection) != 2:
+            return
+        else:
+            for obj in selection:
+                if obj != active_object:
+                    active_object.location = obj.location
+
+        return {'FINISHED'}
 
 #endregion
 
@@ -489,6 +556,13 @@ class CustomPanel(bpy.types.Panel):
         row = layout.row()
         row.operator(BOAlinharADoisObjetos.bl_idname,
                      text="Alinhar entre", icon='IPO_LINEAR')
+        row = layout.row()
+        row.operator(BOAlinharOrigemASeleção.bl_idname,
+                     text="Origem a seleção", icon='EMPTY_AXIS')
+        row = layout.row()
+        row.operator(BOALinharElementoAOutro.bl_idname,
+                     text="Alinhar objeto", icon='EMPTY_AXIS')
+        
         
 
 _classes = [
@@ -501,6 +575,8 @@ _classes = [
     BOMoverOrigemEmYNeg,
     BOMoverParaOrigem,
     BOAlinharADoisObjetos,
+    BOAlinharOrigemASeleção,
+    BOALinharElementoAOutro,
     CustomPanel]
 
 
