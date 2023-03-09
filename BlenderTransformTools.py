@@ -3,6 +3,7 @@ from bpy.types import Operator
 import math
 import bpy
 import mathutils
+from mathutils import Vector
 import os
 import bmesh
 import json
@@ -513,6 +514,56 @@ class BOALinharElementoAOutro(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class BOAlinharSelecaoEmX(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "potato.12"
+    bl_label = "Simple potato Operator"
+
+    
+
+    def execute(self, context):
+        
+        print('BOAlinharSelecaoEmX')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharElemento(obj, 0)
+
+        return {'FINISHED'}
+    
+class BOAlinharSelecaoEmY(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "potato.13"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('BOAlinharSelecaoEmY')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharElemento(obj, 1)
+
+        return {'FINISHED'}
+    
+class BOAlinharSelecaoEmZ(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "potato.14"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+        
+        print('BOAlinharSelecaoEmZ')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharElemento(obj, 2)
+
+        return {'FINISHED'}
+
 #endregion
 
 
@@ -562,6 +613,13 @@ class CustomPanel(bpy.types.Panel):
         row = layout.row()
         row.operator(BOALinharElementoAOutro.bl_idname,
                      text="Alinhar objeto", icon='EMPTY_AXIS')
+        row = layout.row()
+        row.operator(BOAlinharSelecaoEmX.bl_idname,
+                     text="X")
+        row.operator(BOAlinharSelecaoEmY.bl_idname,
+                     text="Y")
+        row.operator(BOAlinharSelecaoEmZ.bl_idname,
+                     text="Z")
         
         
 
@@ -577,11 +635,224 @@ _classes = [
     BOAlinharADoisObjetos,
     BOAlinharOrigemASeleção,
     BOALinharElementoAOutro,
+    BOAlinharSelecaoEmX,
+    BOAlinharSelecaoEmY,
+    BOAlinharSelecaoEmZ,
     CustomPanel]
 
 
 #region FUNÇÕES
 
+def AlinharElemento(obj, direcao):
+    # Cria um bmesh dele
+        mesh = obj.data
+        bm = bmesh.from_edit_mesh(mesh)
+        
+        # Pega o modo de edição
+        editMode = 0
+        edit = False
+
+        if bpy.context.object.mode == 'EDIT':
+            edit = True
+            if mesh.is_editmode:
+                # Verifica o modo de seleção ativo
+                if bpy.context.tool_settings.mesh_select_mode[0]:
+                    editMode = 0
+                    print("Modo de seleção de Vértices ativo")
+                elif bpy.context.tool_settings.mesh_select_mode[1]:
+                    editMode = 1
+                    print("Modo de seleção de Bordas ativo")
+                elif bpy.context.tool_settings.mesh_select_mode[2]:
+                    editMode = 2
+                    print("Modo de seleção de Faces ativo")
+        else:
+            return {'FINISHED'}
+        
+        # Caso o modo de edição esteja ativo
+        if editMode == 0:
+            return {'FINISHED'}
+
+        if editMode == 1:
+            # Pega a face selecionada
+            edges = []
+
+            for edge in bm.edges:
+                if edge.select:
+                    edges.append(edge)
+
+            edge = edges[0]
+
+            bpy.ops.mesh.select_linked()
+            AlinharArestas(bm, edge, direcao)
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+            # Volta a seleção para o elemento selecionado originalmente
+            edge.select = True
+            # Atualiza na vista o objeto
+            bpy.ops.object.mode_set(mode='OBJECT') 
+            bpy.ops.object.mode_set(mode='EDIT') 
+
+        if editMode == 2:
+        # Pega a face selecionada
+            faces = []
+
+            for face in bm.faces:
+                if face.select:
+                    faces.append(face)
+
+            face = faces[0]
+
+            bpy.ops.mesh.select_linked()
+            AlinharFace(bm, face, direcao)
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+            # Volta a seleção para o elemento selecionado originalmente
+            face.select = True
+            # Atualiza na vista o objeto
+            bpy.ops.object.mode_set(mode='OBJECT') 
+            bpy.ops.object.mode_set(mode='EDIT')
+
+def AlinharArestas(bm, source, direcao):
+    if source == None:
+        return    
+    moveverts = []
+    for v1 in bm.verts:
+        if v1.select:
+            moveverts.append(v1)
+        
+    center = Vector((0.0, 0.0, 0.0))
+    for v1 in moveverts:
+        center = center + v1.co    
+        
+    center = center / len(moveverts)    
+    
+    # Altera o valor dos vetores conforme a direcão
+    vetorInicial = Vector((0,0,0))
+    vetorFinal = Vector((0,0,0))
+    vetorMedio = Vector((0,0,0))
+    if direcao == 0:
+        vetorFinal = Vector((1,0,0))
+    elif direcao == 1:
+        vetorFinal = Vector((0,1,0))
+    elif direcao == 2:
+        vetorFinal = Vector((0,0,1))
+    
+    sv = source.verts[0].co - source.verts[1].co    
+    tv = vetorInicial - vetorFinal
+    
+    sv2 = sv * -1   
+    
+    ro1 = sv.rotation_difference(tv)
+    ro2 = sv2.rotation_difference(tv)    
+    
+    c1 = vs_midpoint(source.verts[0], source.verts[1])
+    c2 = (vetorInicial + vetorFinal) /2
+    
+    result1 = rotate_vector(c1, center, ro1) - c2
+    result2 = rotate_vector(c1, center, ro2) - c2
+    if result1.length < result2.length:
+        ro3 = ro1
+    else:
+        ro3 = ro2    
+    #if invert_direction:
+    #    sv = sv * -1
+    #ro1 = sv.rotation_difference(tv)
+    
+    matro = ro3.to_matrix()
+    bmesh.ops.rotate(bm, cent=center, matrix=matro, verts=moveverts)
+
+def AlinharVertices(bm, source, direcao):
+    print(len(source))
+    if source == None or len(source) < 2:
+        return    
+    moveverts = []
+    for v1 in bm.verts:
+        if v1.select:
+            moveverts.append(v1)
+        
+    center = Vector((0.0, 0.0, 0.0))
+    for v1 in moveverts:
+        center = center + v1.co    
+        
+    center = center / len(moveverts)    
+    
+    # Altera o valor dos vetores conforme a direcão
+    vetorInicial = Vector((0,0,0))
+    vetorFinal = Vector((0,0,0))
+    vetorMedio = Vector((0,0,0))
+    if direcao == 0:
+        vetorFinal = Vector((1,0,0))
+    elif direcao == 1:
+        vetorFinal = Vector((0,1,0))
+    elif direcao == 2:
+        vetorFinal = Vector((0,0,1))
+    
+    sv = moveverts[0].co - moveverts[1].co    
+    tv = vetorInicial - vetorFinal
+    
+    sv2 = sv * -1   
+    
+    ro1 = sv.rotation_difference(tv)
+    ro2 = sv2.rotation_difference(tv)    
+    
+    c1 = vs_midpoint(moveverts[0], moveverts[1])
+    c2 = (vetorInicial + vetorFinal) /2
+    
+    result1 = rotate_vector(c1, center, ro1) - c2
+    result2 = rotate_vector(c1, center, ro2) - c2
+    if result1.length < result2.length:
+        ro3 = ro1
+    else:
+        ro3 = ro2    
+    #if invert_direction:
+    #    sv = sv * -1
+    #ro1 = sv.rotation_difference(tv)
+    
+    matro = ro3.to_matrix()
+    bmesh.ops.rotate(bm, cent=center, matrix=matro, verts=moveverts)
+
+def AlinharFace(bm, face, direcao):
+    if face == None:
+        return    
+    
+    # Guarda os vértices selecionados
+    faceVerts = []
+    
+    for v in bm.verts:
+        if v.select:
+            faceVerts.append(v)
+    
+    # Pega o ponto central da face
+    faceCenterPoint = face.calc_center_median()
+    #tp = Vector((0,0,0))
+    targetPoint = faceCenterPoint # Usa o mesmo centro para o alvo
+    
+    # Calcula as transformacões necessarias
+    norm = Vector((0,0,1))
+    if direcao == 0:
+        norm = Vector((1,0,0))
+    elif direcao == 1:
+        norm = Vector((0,1,0))
+    elif direcao == 2:
+        norm = Vector((0,0,1))  
+    rodif = face.normal.rotation_difference(norm)    
+    matro = rodif.to_matrix()
+    
+    bmesh.ops.rotate(bm, cent=faceCenterPoint, matrix=matro, verts=faceVerts)    
+    movedif = targetPoint - faceCenterPoint
+    bmesh.ops.translate(bm, vec=movedif, verts=faceVerts)  
+  
+def vs_midpoint(v1, v2):
+    return (v1.co + v2.co)/2
+
+def rotate_vector(v, center, q):
+    v2 = v.copy()
+    v2 = v2 - center
+    v2.rotate(q)
+    v2 = v2 + center
+    return v2
 
 #endregion
 
