@@ -516,7 +516,7 @@ class BOALinharElementoAOutro(bpy.types.Operator):
 
 class BOAlinharSelecaoEmX(bpy.types.Operator):
     """Tooltip"""
-    bl_idname = "potato.12"
+    bl_idname = "alinsel.1"
     bl_label = "Simple potato Operator"
 
     
@@ -528,13 +528,13 @@ class BOAlinharSelecaoEmX(bpy.types.Operator):
         # Pega o objeto ativo
         obj = bpy.context.active_object
 
-        AlinharElemento(obj, 0)
+        AlinharObjeto(obj, 0, False)
 
         return {'FINISHED'}
     
 class BOAlinharSelecaoEmY(bpy.types.Operator):
     """Tooltip"""
-    bl_idname = "potato.13"
+    bl_idname = "alinsel.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -544,13 +544,13 @@ class BOAlinharSelecaoEmY(bpy.types.Operator):
         # Pega o objeto ativo
         obj = bpy.context.active_object
 
-        AlinharElemento(obj, 1)
+        AlinharObjeto(obj, 1, False)
 
         return {'FINISHED'}
     
 class BOAlinharSelecaoEmZ(bpy.types.Operator):
     """Tooltip"""
-    bl_idname = "potato.14"
+    bl_idname = "alinsel.3"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -560,13 +560,63 @@ class BOAlinharSelecaoEmZ(bpy.types.Operator):
         # Pega o objeto ativo
         obj = bpy.context.active_object
 
-        AlinharElemento(obj, 2)
+        AlinharObjeto(obj, 2, False)
 
         return {'FINISHED'}
 
+
+class BOAlinharObjetoEmX(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "alinobj.1"
+    bl_label = "Simple potato Operator"
+
+    
+
+    def execute(self, context):
+        
+        print('BOAlinharObjetoEmX')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharObjeto(obj, 0, True)
+
+        return {'FINISHED'}
+    
+class BOAlinharObjetoEmY(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "alinobj.2"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('BOAlinharObjetoEmY')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharObjeto(obj, 1, True)
+
+        return {'FINISHED'}
+    
+class BOAlinharObjetoEmZ(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "alinobj.3"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+        
+        print('BOAlinharObjetoEmZ')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        AlinharObjeto(obj, 2, True)
+
+        return {'FINISHED'}
+
+
 #endregion
-
-
 
 class CustomPanel(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
@@ -579,41 +629,58 @@ class CustomPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        obj = context.object
-
-        row = layout.row()
+        box = layout.box()
+        box.label(text="Alterar origem")
+        row = box.row()
+        row.operator(BOMoverParaOrigem.bl_idname,
+                    text="Mover 0,0,0", icon='EMPTY_AXIS')
+        row = box.row()
         row.operator(BOAlinharOrigemCentroSuperior.bl_idname,
                      text="Eixo superior", icon='EMPTY_AXIS')
-        row = layout.row()
+        row = box.row()
         row.operator(BOAlinharOrigemCentro.bl_idname,
                      text="Eixo centro", icon='EMPTY_AXIS')
-        row = layout.row()
+        row = box.row()
         row.operator(BOAlinharOrigemCentroInferior.bl_idname,
                      text="Eixo inferior", icon='EMPTY_AXIS')
-        row = layout.row()
+        row = box.row()
+        row.operator(BOAlinharOrigemASeleção.bl_idname,
+                     text="Origem a seleção", icon='EMPTY_AXIS')
+        
+        box = layout.box()
+        box.label(text="Mover origem para cantos")
+        row = box.row()
+        row.scale_x = 2
+        row.alignment = 'CENTER'
         row.operator(BOMoverOrigemEmYPos.bl_idname,
                      text="", icon='TRIA_UP')
-        row = layout.row()
+        row = box.row()
+        row.scale_x = 2
+        row.alignment = 'CENTER'
         row.operator(BOMoverOrigemEmXNeg.bl_idname,
                      text="", icon='TRIA_LEFT')
         row.operator(BOMoverOrigemEmXPos.bl_idname,
                      text="", icon='TRIA_RIGHT')
-        row = layout.row()
+        row = box.row()
+        row.scale_x = 2
+        row.alignment = 'CENTER'
         row.operator(BOMoverOrigemEmYNeg.bl_idname,
                      text="", icon='TRIA_DOWN')
-        row = layout.row()
-        row.operator(BOMoverParaOrigem.bl_idname,
-                     text="Mover 0,0,0", icon='EMPTY_AXIS')
-        row = layout.row()
+        
+
+        box = layout.box()
+        box.label(text="Alinhar objetos")
+        row = box.row()
         row.operator(BOAlinharADoisObjetos.bl_idname,
                      text="Alinhar entre", icon='IPO_LINEAR')
-        row = layout.row()
-        row.operator(BOAlinharOrigemASeleção.bl_idname,
-                     text="Origem a seleção", icon='EMPTY_AXIS')
-        row = layout.row()
+        row = box.row()
         row.operator(BOALinharElementoAOutro.bl_idname,
                      text="Alinhar objeto", icon='EMPTY_AXIS')
-        row = layout.row()
+        
+        
+        box = layout.box()
+        box.label(text="Alinhar edição linkada")
+        row = box.row()
         row.operator(BOAlinharSelecaoEmX.bl_idname,
                      text="X")
         row.operator(BOAlinharSelecaoEmY.bl_idname,
@@ -621,8 +688,16 @@ class CustomPanel(bpy.types.Panel):
         row.operator(BOAlinharSelecaoEmZ.bl_idname,
                      text="Z")
         
+        box = layout.box()
+        box.label(text="Alinhar edição objeto")
+        row = box.row()
+        row.operator(BOAlinharObjetoEmX.bl_idname,
+                     text="X")
+        row.operator(BOAlinharObjetoEmY.bl_idname,
+                     text="Y")
+        row.operator(BOAlinharObjetoEmZ.bl_idname,
+                     text="Z")
         
-
 _classes = [
     BOAlinharOrigemCentro,
     BOAlinharOrigemCentroInferior,
@@ -638,10 +713,139 @@ _classes = [
     BOAlinharSelecaoEmX,
     BOAlinharSelecaoEmY,
     BOAlinharSelecaoEmZ,
+    BOAlinharObjetoEmX,
+    BOAlinharObjetoEmY,
+    BOAlinharObjetoEmZ,
     CustomPanel]
 
 
 #region FUNÇÕES
+
+def AlinharObjeto(obj, direcao, todoOObjeto):
+    # Cria um bmesh dele
+        mesh = obj.data
+        bm = bmesh.from_edit_mesh(mesh)
+        
+        # Pega o modo de edição
+        editMode = 0
+        edit = False
+
+        if bpy.context.object.mode == 'EDIT':
+            edit = True
+            if mesh.is_editmode:
+                # Verifica o modo de seleção ativo
+                if bpy.context.tool_settings.mesh_select_mode[0]:
+                    editMode = 0
+                    print("Modo de seleção de Vértices ativo")
+                elif bpy.context.tool_settings.mesh_select_mode[1]:
+                    editMode = 1
+                    print("Modo de seleção de Bordas ativo")
+                elif bpy.context.tool_settings.mesh_select_mode[2]:
+                    editMode = 2
+                    print("Modo de seleção de Faces ativo")
+        else:
+            return {'FINISHED'}
+        
+        # Caso o modo de edição esteja ativo
+        if editMode == 0:
+            # Pega os vertices selecionados
+            vertices = []
+
+            for vert in bm.verts:
+                if vert.select:
+                    vertices.append(vert)
+
+            if len(vertices) < 2:
+                return
+            
+            # Cria uma nova edge entre os vértices selecionados
+            vert1 = vertices[0]
+            vert2 = vertices[1]
+            edge = bm.edges.new((vert1, vert2))
+
+            # Muda para o modo de edição de edges
+            bpy.ops.mesh.select_mode(type='EDGE')
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+
+            # Seleciona a nova edge
+            edge.select = True
+
+            if todoOObjeto == True:
+                bpy.ops.mesh.select_all(action='SELECT')
+            else:
+                bpy.ops.mesh.select_linked()
+
+            AlinharArestas(bm, edge, direcao)
+
+            # Deleta a nova edge
+            bm.edges.remove(edge)
+
+            # Muda para o modo de edição de edges
+            bpy.ops.mesh.select_mode(type='VERT')
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+            # Volta a seleção para o elemento selecionado originalmente
+            vert1.select = True
+            vert2.select = True
+            # Atualiza na vista o objeto
+            bpy.ops.object.mode_set(mode='OBJECT') 
+            bpy.ops.object.mode_set(mode='EDIT')
+
+
+            return {'FINISHED'}
+
+        if editMode == 1:
+            # Pega as edges selecionada
+            edges = []
+
+            for edge in bm.edges:
+                if edge.select:
+                    edges.append(edge)
+
+            edge = edges[0]
+
+            if todoOObjeto == True:
+                bpy.ops.mesh.select_all(action='SELECT')
+            else:
+                bpy.ops.mesh.select_linked()
+
+            AlinharArestas(bm, edge, direcao)
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+            # Volta a seleção para o elemento selecionado originalmente
+            edge.select = True
+            # Atualiza na vista o objeto
+            bpy.ops.object.mode_set(mode='OBJECT') 
+            bpy.ops.object.mode_set(mode='EDIT') 
+
+        if editMode == 2:
+        # Pega a face selecionada
+            faces = []
+
+            for face in bm.faces:
+                if face.select:
+                    faces.append(face)
+
+            face = faces[0]
+
+            if todoOObjeto:
+                bpy.ops.mesh.select_all(action='SELECT')
+            else:
+                bpy.ops.mesh.select_linked()
+
+            AlinharFace(bm, face, direcao)
+
+            # Desseleciona todos os objetos
+            bpy.ops.mesh.select_all(action='DESELECT')
+            # Volta a seleção para o elemento selecionado originalmente
+            face.select = True
+            # Atualiza na vista o objeto
+            bpy.ops.object.mode_set(mode='OBJECT') 
+            bpy.ops.object.mode_set(mode='EDIT')
 
 def AlinharElemento(obj, direcao):
     # Cria um bmesh dele
