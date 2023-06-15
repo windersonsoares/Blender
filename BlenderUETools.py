@@ -30,12 +30,10 @@ class CadType(enum.Enum):
     Point = 5
     Block = 6
 
-
 class CurveType(enum.Enum):
     Line = 0
     Arc = 1
     Circle = 2
-
 
 class ButtonOperator(bpy.types.Operator):
     """Tooltip"""
@@ -46,10 +44,9 @@ class ButtonOperator(bpy.types.Operator):
         print('Potato')
         return {'FINISHED'}
 
-
 class ButtonOperatorShadeNormal(bpy.types.Operator):
     """Altera o Shade do elemento para Shade Smooth e define as Normals das faces"""
-    bl_idname = "potato.1"
+    bl_idname = "shade.1"
     bl_label = "ShadeNormal Operator"
 
     def execute(self, context):
@@ -92,10 +89,9 @@ class ButtonOperatorShadeNormal(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorSDeffineBottomOrigin(bpy.types.Operator):
     """Define a origem do elemento como sendo o centro inferior"""
-    bl_idname = "potato.2"
+    bl_idname = "origin.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -146,10 +142,9 @@ class ButtonOperatorSDeffineBottomOrigin(bpy.types.Operator):
         bpy.context.view_layer.objects.active = active_object
         return {'FINISHED'}
 
-
 class ButtonOperatorExportToClipboard(bpy.types.Operator):
     """Copia para a área de transferência as informações dos elementos para ser cerem criados dentro da UE como referência"""
-    bl_idname = "potato.3"
+    bl_idname = "export.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -226,10 +221,9 @@ class ButtonOperatorExportToClipboard(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorCleanUVChannels(bpy.types.Operator):
     """Limpa os canais de UV"""
-    bl_idname = "potato.4"
+    bl_idname = "uv.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -272,10 +266,9 @@ class ButtonOperatorCleanUVChannels(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorViewUnwrapIndividual(bpy.types.Operator):
     """""SmartUnwrap os elementos selecionados preparando para a UE"""
-    bl_idname = "potato.5"
+    bl_idname = "uv.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -349,10 +342,9 @@ class ButtonOperatorViewUnwrapIndividual(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorUnwrapElementsToUE(bpy.types.Operator):
     """Unwrap os elementos selecionados preparando para a UE"""
-    bl_idname = "potato.6"
+    bl_idname = "uv.3"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -453,10 +445,9 @@ class ButtonOperatorUnwrapElementsToUE(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorCleanMaterials(bpy.types.Operator):
     """Limpa os materiais dos elementos selecionados"""
-    bl_idname = "potato.7"
+    bl_idname = "uv.4"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -474,6 +465,8 @@ class ButtonOperatorCleanMaterials(bpy.types.Operator):
 
         for obj in selection:
             if obj.type == 'MESH':
+                # Define o objeto ativo
+                bpy.context.view_layer.objects.active = obj
                 ms = obj.data.materials
                 for i in range(len(ms) - 1, 0, -1):
                     obj.active_material_index = i
@@ -487,10 +480,9 @@ class ButtonOperatorCleanMaterials(bpy.types.Operator):
         bpy.context.view_layer.objects.active = active_object
         return {'FINISHED'}
 
-
 class ButtonOperatorSelectNonPolygon(bpy.types.Operator):
     """Seleciona elementos que não contenham polígonos"""
-    bl_idname = "potato.8"
+    bl_idname = "select.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -524,10 +516,9 @@ class ButtonOperatorSelectNonPolygon(bpy.types.Operator):
                 obj.select_set(True)
         return {'FINISHED'}
 
-
 class ButtonExportEchSelectedToFBX(bpy.types.Operator):
     """Exporta cada objeto selecionado para um arquivo FBX com o mesmo nome"""
-    bl_idname = "potato.9"
+    bl_idname = "export.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -564,10 +555,9 @@ class ButtonExportEchSelectedToFBX(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtoNOperatorBoundingBoxCube(bpy.types.Operator):
     """Cria um cubo a partir da BoundingBox dos elementos selecionados"""
-    bl_idname = "potato.10"
+    bl_idname = "generate.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -625,10 +615,9 @@ class ButtoNOperatorBoundingBoxCube(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtoNOperatorBoundingBoxCubeAndDelete(bpy.types.Operator):
     """Cria um cubo a partir da BoundingBox dos elementos selecionados e exclui os mesmos ao final"""
-    bl_idname = "potato.11"
+    bl_idname = "generate.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -695,10 +684,9 @@ class ButtoNOperatorBoundingBoxCubeAndDelete(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtoNOperatorConnectOuterEdges(bpy.types.Operator):
     """Conecta as arestas externas dos elementos selecionados"""
-    bl_idname = "potato.12"
+    bl_idname = "generate.3"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -723,7 +711,7 @@ class ButtoNOperatorConnectOuterEdges(bpy.types.Operator):
 
 class ButtoNOperatorConnectOuterEdgesMany(bpy.types.Operator):
     """Conecta as arestas externas dos elementos selecionados"""
-    bl_idname = "potato.25"
+    bl_idname = "generate.4"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -746,11 +734,10 @@ class ButtoNOperatorConnectOuterEdgesMany(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorWorldSpaceUnwrapIndividual(bpy.types.Operator):
 
     """""SmartUnwrap os elementos selecionados com dimensão alterada"""
-    bl_idname = "potato.13"
+    bl_idname = "uv.5"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -825,10 +812,9 @@ class ButtonOperatorWorldSpaceUnwrapIndividual(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorSDeffineTopOrigin(bpy.types.Operator):
     """Define a origem do elemento como sendo o centro superior"""
-    bl_idname = "potato.14"
+    bl_idname = "origin.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -879,10 +865,9 @@ class ButtonOperatorSDeffineTopOrigin(bpy.types.Operator):
         bpy.context.view_layer.objects.active = active_object
         return {'FINISHED'}
 
-
 class ButtonOperatorExportEdges(bpy.types.Operator):
     """Exporta as arestas de um mesh para uma lista de pontos iniciais e finais"""
-    bl_idname = "potato.15"
+    bl_idname = "export.3"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -936,10 +921,9 @@ class ButtonOperatorExportEdges(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorSelectVisibleSharpenEdges(bpy.types.Operator):
     """Seleciona as arestas visíveis dos elementos"""
-    bl_idname = "potato.16"
+    bl_idname = "select.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -967,10 +951,9 @@ class ButtonOperatorSelectVisibleSharpenEdges(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorImportCAD(bpy.types.Operator):
     """Cria linhas com base na exportação do CAD"""
-    bl_idname = "potato.17"
+    bl_idname = "import.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -998,24 +981,44 @@ class ButtonOperatorImportCAD(bpy.types.Operator):
                 linhaObj = CreateLine(pontoInicial, pontoFinal)
                 SetOriginCenter(linhaObj)
 
+            # Caso seja Arco
+            if cadType == CadType.Arc:
+                arc = cadObj["ArcGeometry"]["Arc"]
+                raio = arc["Radius"]
+                centro = (arc["Center"]["XCoord"], arc["Center"]
+                                ["YCoord"], arc["Center"]["ZCoord"])
+                pontoInicial = (arc["StartPoint"]["XCoord"], arc["StartPoint"]
+                                ["YCoord"], arc["StartPoint"]["ZCoord"])
+                pontoFinal = (arc["EndPoint"]["XCoord"], arc["EndPoint"]
+                              ["YCoord"], arc["EndPoint"]["ZCoord"])
+                arcObj = CreateArc(centro, raio, pontoInicial, pontoFinal)
+                #SetOriginCenter(arcObj)
+
             # Caso seja PolyLinha
             if cadType == cadType.Polyline:
-                lines = cadObj["PolylineGeometry"]["ListCurves"]
-                pontos = []
-                for line in lines:
-                    if CurveType(line["CurveType"]) == CurveType.Line:
-                        pontoInicial = (
-                            line["StartPoint"]["XCoord"], line["StartPoint"]["YCoord"], line["StartPoint"]["ZCoord"])
-                        pontos.append(pontoInicial)
-                polylinhaObj = CreatePolyLine(pontos)
-                SetOriginCenter(polylinhaObj)
-
+                curves = cadObj["PolylineGeometry"]["ListCurves"]
+                for curve in curves:
+                    if CurveType(curve["CurveType"]) == CurveType.Line:
+                        pontoInicial = (curve["StartPoint"]["XCoord"], curve["StartPoint"]
+                                        ["YCoord"], curve["StartPoint"]["ZCoord"])
+                        pontoFinal = (curve["EndPoint"]["XCoord"], curve["EndPoint"]
+                                    ["YCoord"], curve["EndPoint"]["ZCoord"])
+                        linhaObj = CreateLine(pontoInicial, pontoFinal)
+                    if CurveType(curve["CurveType"]) == CurveType.Arc:
+                        raio = curve["Radius"]
+                        centro = (curve["Center"]["XCoord"], curve["Center"]
+                                        ["YCoord"], curve["Center"]["ZCoord"])
+                        pontoInicial = (curve["StartPoint"]["XCoord"], curve["StartPoint"]
+                                        ["YCoord"], curve["StartPoint"]["ZCoord"])
+                        pontoFinal = (curve["EndPoint"]["XCoord"], curve["EndPoint"]
+                                    ["YCoord"], curve["EndPoint"]["ZCoord"])
+                        arcObj = CreateArc(centro, raio, pontoInicial, pontoFinal)
+       
         return {'FINISHED'}
-
 
 class ButtonOperatorClarCustomProperties(bpy.types.Operator):
     """Limpa as Custom Properties dos objetos selecionados"""
-    bl_idname = "potato.18"
+    bl_idname = "props.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1033,10 +1036,9 @@ class ButtonOperatorClarCustomProperties(bpy.types.Operator):
             
         return {'FINISHED'}
 
-
 class ButtonOperatorAddCronoCustomProperties(bpy.types.Operator):
     """Adiciona as Custom Properties padrões do cronograma"""
-    bl_idname = "potato.19"
+    bl_idname = "props.2"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1054,10 +1056,9 @@ class ButtonOperatorAddCronoCustomProperties(bpy.types.Operator):
             
         return {'FINISHED'}
 
-
 class ButtonOperatorCleanUnusedMaterials(bpy.types.Operator):
     """Limpa os materiais não utilizados"""
-    bl_idname = "potato.20"
+    bl_idname = "uv.6"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1089,10 +1090,9 @@ class ButtonOperatorCleanUnusedMaterials(bpy.types.Operator):
             
         return {'FINISHED'}
 
-
 class ButtonOperatorJoinObjectsByCoordinates(bpy.types.Operator):
     """Une os objetos pela sua coordenada"""
-    bl_idname = "potato.21"
+    bl_idname = "modify.1"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1154,7 +1154,7 @@ class ButtonOperatorJoinObjectsByCoordinates(bpy.types.Operator):
 
 class ButtonExportEchSelectedCollectionToFBX(bpy.types.Operator):
     """Exporta cada Collection selecionada para um arquivo FBX com o mesmo nome"""
-    bl_idname = "potato.22"
+    bl_idname = "export.4"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1191,7 +1191,6 @@ class ButtonExportEchSelectedCollectionToFBX(bpy.types.Operator):
 
             bpy.ops.export_scene.fbx(filepath=directory
                                      + '\\'
-                                     + "SM_"
                                      + colecao
                                      + '.fbx',
                                      use_selection=True,
@@ -1208,7 +1207,7 @@ class ButtonExportEchSelectedCollectionToFBX(bpy.types.Operator):
 
 class ButtonOperatorExportToClipboardFaceCenter(bpy.types.Operator):
     """Copia para a área de transferência as informações das faces dos elementos para ser cerem criados dentro da UE como referência"""
-    bl_idname = "potato.23"
+    bl_idname = "export.5"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1283,10 +1282,9 @@ class ButtonOperatorExportToClipboardFaceCenter(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 class ButtonOperatorDivideByAreaFace(bpy.types.Operator):
     """Divide um elemento pelo tamanho das faces"""
-    bl_idname = "potato.24"
+    bl_idname = "modify.3"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1327,7 +1325,7 @@ class ButtonOperatorDivideByAreaFace(bpy.types.Operator):
 
 class ButtonOperatorConnectOuterEdgesBB(bpy.types.Operator):
     """Conecta as areas a partir de uma bounding box"""
-    bl_idname = "potato.25"
+    bl_idname = "generate.5"
     bl_label = "Simple potato Operator"
 
     def execute(self, context):
@@ -1443,6 +1441,171 @@ class ButtonOperatorConnectOuterEdgesBB(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class ButtonOperatorExportSelectedVertex(bpy.types.Operator):
+    """Copia para a área de transferência as informações das faces dos elementos para ser cerem criados dentro da UE como referência"""
+    bl_idname = "export.6"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('---------- CÓDIGO INICIA AQUI - COPY TO CLIPBOARD FACE CENTER ----------')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        # String final
+        finalString = ""
+
+        finalString += "Begin Map"
+        finalString += "\n    Begin Level"
+
+        unitInfo = GetUnits()
+
+        # Matriz de transformações do elemento
+        matrix = obj.matrix_world
+
+
+        # Sai do modo de ediçao, ambos métodos funcionam
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        if obj.type == 'MESH':
+            # Para pegar o mesh após modificadores
+            depsgraph = bpy.context.evaluated_depsgraph_get()
+            bm = bmesh.new()
+            bm.from_object( obj, depsgraph )
+            bm.verts.ensure_lookup_table()
+
+            # Pega os vértices selecionados
+            for i in range(len(bm.verts)):
+                v = bm.verts[i]
+                if v.select:
+                    name = obj.name + str(i)
+                    locX = round(UnitToCentimeter((matrix @ v.co).x, unitInfo), 1)
+                    locY = -round(UnitToCentimeter((matrix @ v.co).y, unitInfo), 1)
+                    locZ = round(UnitToCentimeter((matrix @ v.co).z, unitInfo), 1)
+                    rotX = 0
+                    rotY = 0
+                    rotZ = 0
+                    sclX = 1
+                    sclY = 1
+                    sclZ = 1
+
+                    # Cria a string a partir dos valores
+                    finalString += f"\n        Begin Actor Class=StaticMeshActor Name={name} Archetype=StaticMeshActor'/Script/Engine.Default__StaticMeshActor'"
+                    finalString += "\n            Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0"
+                    finalString += "\n            Archetype=StaticMeshComponent'/Script/Engine.Default__StaticMeshActor:StaticMeshComponent0'"
+                    finalString += "\n            End Object"
+                    finalString += "\n            Begin Object Name=StaticMeshComponent0"
+                    finalString += f"\n                StaticMesh=StaticMesh'/Engine/BasicShapes/Cube.Cube'"
+                    finalString += f"\n                RelativeLocation=(X={locX},Y={locY},Z={locZ})"
+                    finalString += f"\n                RelativeScale3D=(X={sclX},Y={sclY},Z={sclZ})"
+                    finalString += f"\n                RelativeRotation=(Pitch={rotY},Yaw={rotZ},Roll={rotX})"
+                    finalString += "\n                CustomProperties"
+                    finalString += "\n            End Object"
+                    finalString += "\n            StaticMeshComponent=StaticMeshComponent0"
+                    finalString += "\n            Components(0)=StaticMeshComponent0"
+                    finalString += "\n            RootComponent=StaticMeshComponent0"
+                    finalString += f'\n            ActorLabel="{name}"'
+                    finalString += "\n        End Actor"
+
+        finalString += "\n    End Level"
+        finalString += "\nBegin Surface"
+        finalString += "\nEnd Surface"
+        finalString += "\nEnd Map"
+
+        # Copia para a área de transferência e imprime a string final
+        bpy.context.window_manager.clipboard = finalString
+
+        # Ativa o modo de edição, ambos métodos funcionam
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        return {'FINISHED'}
+
+class ButtonOperatorUnwrapCylinder(bpy.types.Operator):
+    """Unwrap um cilindro"""
+    bl_idname = "export.6"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('---------- CÓDIGO INICIA AQUI - UNWRAP CYLINDER ----------')
+
+        # Pega todos os objetos na seleção
+        selection = bpy.context.selected_objects
+
+        # Ativa o modo de edição
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        # Para cada objeto selecionado
+        for obj in selection:
+            if obj.type == 'MESH':
+
+                # Cria um bmesh
+                mesh = obj.data
+                #bm = bmesh.new()
+                #bm.from_mesh(mesh)
+                
+                # Ativa o modo de edição
+                bpy.ops.object.mode_set(mode='EDIT')
+
+                # Remove a seleção
+                bpy.ops.mesh.select_all(action='DESELECT')
+                
+                # Ativa o modo de objeto
+                bpy.ops.object.mode_set(mode='OBJECT')
+
+                # Seleciona as faces inferiores e superiores
+                eixoZ = mathutils.Vector((0,0,1))
+                for face in mesh.polygons:
+                    if face.normal == eixoZ or face.normal == eixoZ * -1:
+                        face.select = True
+
+                # Roda o comando "Select Boundary Loop"
+                # Ativa o modo de edição
+                bpy.ops.object.mode_set(mode='EDIT')
+                bpy.ops.mesh.region_to_loop()
+                
+                # Ativa o modo de objeto
+                bpy.ops.object.mode_set(mode='OBJECT')
+                
+                # Cria a lista de EDGES a serem marcadas
+                edges = []
+                
+                for edge in mesh.edges:
+                    if edge.select == True:
+                        edges.append(edge)
+
+                print(len(edges))
+                
+                for edge in mesh.edges:
+                    vert1 = mesh.vertices[edge.vertices[0]]
+                    vert2 = mesh.vertices[edge.vertices[1]]
+                    direcao = (vert2.co - vert1.co).normalized()
+                    # Caso o produto cruzado for zero então é paralelo ao eixo Z
+                    if direcao.cross(eixoZ).length == 0.0:
+                        edges.append(edge)
+                        break
+                
+                print(len(edges))
+                
+                # Marca a SEAM do UV
+                for edge in mesh.edges:
+                    if edge.select == True:
+                        edge.use_seam = True
+                
+                # Ativa o modo de edição
+                bpy.ops.object.mode_set(mode='EDIT')
+                # Adiciona a seleção
+                bpy.ops.mesh.select_all(action='SELECT')
+                bpy.ops.uv.smart_project()
+                # Ativa o modo de objeto
+                bpy.ops.object.mode_set(mode='OBJECT')
+                        
+        # Ativa o modo de objeto
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        return {'FINISHED'}
+
 
 class CustomPanel(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
@@ -1480,7 +1643,7 @@ class CustomPanel(bpy.types.Panel):
                      text="SmartUnwrapUV e corrigir tamanho", icon='UV_DATA')
         row = layout.row()
         row.operator(ButtonOperatorCleanMaterials.bl_idname,
-                     text="Limar materiais", icon='TRASH')
+                     text="Limpar materiais", icon='TRASH')
         row = layout.row()
         row.operator(ButtonOperatorCleanUVChannels.bl_idname,
                      text="Limpar UVChannels", icon='TRASH')
@@ -1523,7 +1686,11 @@ class CustomPanel(bpy.types.Panel):
         row = layout.row()
         row.operator(ButtonOperatorExportToClipboardFaceCenter.bl_idname,
                      text="Exportar centro faces", icon='WINDOW')
-
+        row.operator(ButtonOperatorExportSelectedVertex.bl_idname,
+                     text="Exportar vértices selecionados", icon='WINDOW')
+        row = layout.row()
+        row.operator(ButtonOperatorUnwrapCylinder.bl_idname,
+                     text="Unwrap cilindro", icon='MESH_CYLINDER')
 
 _classes = [
     ButtonOperatorShadeNormal,
@@ -1548,7 +1715,53 @@ _classes = [
     ButtonOperatorAddCronoCustomProperties,
     ButtonOperatorCleanUnusedMaterials,
     ButtonOperatorExportToClipboardFaceCenter,
+    ButtonOperatorExportSelectedVertex,
+    ButtonOperatorUnwrapCylinder,
     CustomPanel]
+
+def CreateArc(centro, raio, pontoInicial, pontoFinal):
+
+        # Calcula o ângulos iniciais e finais do arco
+        # Calcule os vetores do centro para o início e fim do arco em 3D
+        vetor_inicio = (pontoInicial[0]-centro[0], pontoInicial[1]-centro[1], pontoInicial[2]-centro[2])
+        vetor_fim = (pontoFinal[0]-centro[0], pontoFinal[1]-centro[1], pontoFinal[2]-centro[2])
+
+        # Calcule os ângulos iniciais e finais do arco em 3D usando a tangente inversa
+        angulo_inicial = math.atan2(vetor_inicio[1], vetor_inicio[0])
+        angulo_final = math.atan2(vetor_fim[1], vetor_fim[0])
+
+        # Normalize os ângulos para o intervalo [0, 2*pi)
+        angulo_inicial = (angulo_inicial + 2*math.pi) % (2*math.pi)
+        angulo_final = (angulo_final + 2*math.pi) % (2*math.pi)
+
+        print(angulo_inicial)
+        print(angulo_final)
+
+        # Verifique se o arco está "invertido" (ângulo inicial > ângulo final)
+        if angulo_inicial > angulo_final:
+            angulo_inicial -= 2*math.pi
+            # angulo_final += 2*math.pi
+
+        print(angulo_inicial)
+        print(angulo_final)
+
+        # Cria um objeto a partir da linha
+        arcoObj = bpy.ops.curve.simple(
+            Simple_Type='Arc',
+            Simple_radius=raio,
+            location = centro,
+            Simple_startangle=math.degrees(angulo_inicial), 
+            Simple_endangle=math.degrees(angulo_final), 
+            Simple_sides=4, 
+            outputType='BEZIER', 
+            use_cyclic_u=False
+        )
+
+        # Sai do modo de edição se não os arcos são criados juntos
+        bpy.ops.object.editmode_toggle()
+
+        # Retorna a linha
+        return arcoObj
 
 def CreateLine(pontoInicial, pontoFinal):
 
@@ -1614,7 +1827,7 @@ def SetOriginCenter(object):
     # Desseleciona o objeto
     object.select_set(False)
     
-def CreateArc(pontoInicial, pontoFinal, pontoMedio):
+""" def CreateArc(pontoInicial, pontoFinal, pontoMedio):
 
     # Cria o arco
     curveData = bpy.data.curves.new(name="Arc", type="CURVE")
@@ -1644,7 +1857,7 @@ def CreateArc(pontoInicial, pontoFinal, pontoMedio):
     # Cria um objeto para guardar a curva e adiciona a cena
     arcObj = bpy.data.objects.new("Arc", curveData)
     bpy.context.collection.objects.link(arcObj)
-
+ """
 def CreatePolyLine(pontos):
 
     # Cria a Polylinha
