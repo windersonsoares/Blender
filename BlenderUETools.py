@@ -1530,20 +1530,25 @@ class ButtonOperatorUnwrapCylinder(bpy.types.Operator):
 
         print('---------- CÓDIGO INICIA AQUI - UNWRAP CYLINDER ----------')
 
+        # Ativa o modo de objeto
+        bpy.ops.object.mode_set(mode='OBJECT')
+            
         # Pega todos os objetos na seleção
         selection = bpy.context.selected_objects
 
-        # Ativa o modo de edição
-        bpy.ops.object.mode_set(mode='EDIT')
+        # Desleciona todos os objetos
+        bpy.ops.object.select_all(action='DESELECT')
 
         # Para cada objeto selecionado
         for obj in selection:
-            if obj.type == 'MESH':
 
-                # Cria um bmesh
+            if obj.type == 'MESH':
+            
+                # Retorna a seleção para o objeto
+                obj.select_set(True)
+            
+                # Pega o mesh
                 mesh = obj.data
-                #bm = bmesh.new()
-                #bm.from_mesh(mesh)
                 
                 # Ativa o modo de edição
                 bpy.ops.object.mode_set(mode='EDIT')
@@ -1557,7 +1562,8 @@ class ButtonOperatorUnwrapCylinder(bpy.types.Operator):
                 # Seleciona as faces inferiores e superiores
                 eixoZ = mathutils.Vector((0,0,1))
                 for face in mesh.polygons:
-                    if face.normal == eixoZ or face.normal == eixoZ * -1:
+                    print(face.normal)
+                    if face.normal.z == 1 or face.normal.z == -1:
                         face.select = True
 
                 # Roda o comando "Select Boundary Loop"
@@ -1574,20 +1580,18 @@ class ButtonOperatorUnwrapCylinder(bpy.types.Operator):
                 for edge in mesh.edges:
                     if edge.select == True:
                         edges.append(edge)
-
-                print(len(edges))
-                
+                        
                 for edge in mesh.edges:
                     vert1 = mesh.vertices[edge.vertices[0]]
                     vert2 = mesh.vertices[edge.vertices[1]]
                     direcao = (vert2.co - vert1.co).normalized()
+                    #print(f'Direção= {direcao}')
                     # Caso o produto cruzado for zero então é paralelo ao eixo Z
                     if direcao.cross(eixoZ).length == 0.0:
+                        edge.use_seam = True
                         edges.append(edge)
                         break
-                
-                print(len(edges))
-                
+                    
                 # Marca a SEAM do UV
                 for edge in mesh.edges:
                     if edge.select == True:
@@ -1597,12 +1601,114 @@ class ButtonOperatorUnwrapCylinder(bpy.types.Operator):
                 bpy.ops.object.mode_set(mode='EDIT')
                 # Adiciona a seleção
                 bpy.ops.mesh.select_all(action='SELECT')
-                bpy.ops.uv.smart_project()
+                bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0)
                 # Ativa o modo de objeto
                 bpy.ops.object.mode_set(mode='OBJECT')
+                
+                # Desleciona todos os objetos
+                bpy.ops.object.select_all(action='DESELECT')
                         
         # Ativa o modo de objeto
         bpy.ops.object.mode_set(mode='OBJECT')
+
+
+        return {'FINISHED'}
+
+class ButtonOperatorExportObjectCenter(bpy.types.Operator):
+    """Copia para a área de transferência a locação central dos elementos para ser cerem criados dentro da UE como referência"""
+    bl_idname = "exportobjectcenter.1"
+    bl_label = "Simple potato Operator"
+
+    def execute(self, context):
+
+        print('---------- CÓDIGO INICIA AQUI - ButtonOperatorExportObjectCenter ----------')
+
+        # Pega o objeto ativo
+        obj = bpy.context.active_object
+
+        # Pega todos os objetos na seleção
+        selection = bpy.context.selected_objects
+
+        # String final
+        finalString = ""
+
+        finalString += "Begin Map"
+        finalString += "\n    Begin Level"
+
+        unitInfo = GetUnits()
+
+        for i in range(len(selection)):
+
+            obj = selection[i]
+
+            # Pontos das BoundingBoxes globais
+            bboxesPoints = []
+
+            # Pega a matriz do objeto
+            matrixWorld = obj.matrix_world
+
+            # Pega a BoundingBox do objeto selecionado nas coordenadas locais
+            bbox = obj.bound_box
+
+            # Itera sobre cada canto da BoundingBox
+            for corner in bbox:
+
+                # Multiplica as coordenadas do canto pela matriz
+                worldCorner = matrixWorld @ mathutils.Vector(corner)
+
+                # Adiciona as coordenadas globais para a lista de coordenadas
+                bboxesPoints.append(worldCorner)
+   
+
+            minX = min([p[0] for p in bboxesPoints])
+            minY = min([p[1] for p in bboxesPoints])
+            minZ = min([p[2] for p in bboxesPoints])
+
+            maxX = max([p[0] for p in bboxesPoints])
+            maxY = max([p[1] for p in bboxesPoints])
+            maxZ = max([p[2] for p in bboxesPoints])
+
+            print(minX)
+            print(maxX)
+
+            centro = mathutils.Vector([(minX+maxX)/2, (minY+maxY)/2, (minZ+maxZ)/2])
+
+            name = obj.name + str(i)
+            locX = round(UnitToCentimeter(centro.x, unitInfo), 1)
+            locY = -round(UnitToCentimeter(centro.y, unitInfo), 1)
+            locZ = round(UnitToCentimeter(centro.z, unitInfo), 1)
+            rotation = obj.rotation_euler
+            rotX = rotation.x * 180 / math.pi
+            rotY = rotation.y * 180 / math.pi
+            rotZ = rotation.z * 180 / math.pi
+            sclX = 1
+            sclY = 1
+            sclZ = 1
+            # Cria a string a partir dos valores
+            finalString += f"\n        Begin Actor Class=StaticMeshActor Name={name} Archetype=StaticMeshActor'/Script/Engine.Default__StaticMeshActor'"
+            finalString += "\n            Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0"
+            finalString += "\n            Archetype=StaticMeshComponent'/Script/Engine.Default__StaticMeshActor:StaticMeshComponent0'"
+            finalString += "\n            End Object"
+            finalString += "\n            Begin Object Name=StaticMeshComponent0"
+            finalString += f"\n                StaticMesh=StaticMesh'/Engine/BasicShapes/Cube.Cube'"
+            finalString += f"\n                RelativeLocation=(X={locX},Y={locY},Z={locZ})"
+            finalString += f"\n                RelativeScale3D=(X={sclX},Y={sclY},Z={sclZ})"
+            finalString += f"\n                RelativeRotation=(Pitch={rotY},Yaw={rotZ},Roll={rotX})"
+            finalString += "\n                CustomProperties"
+            finalString += "\n            End Object"
+            finalString += "\n            StaticMeshComponent=StaticMeshComponent0"
+            finalString += "\n            Components(0)=StaticMeshComponent0"
+            finalString += "\n            RootComponent=StaticMeshComponent0"
+            finalString += f'\n            ActorLabel="{name}"'
+            finalString += "\n        End Actor"
+
+        finalString += "\n    End Level"
+        finalString += "\nBegin Surface"
+        finalString += "\nEnd Surface"
+        finalString += "\nEnd Map"
+
+        # Copia para a área de transferência e imprime a string final
+        bpy.context.window_manager.clipboard = finalString
 
         return {'FINISHED'}
 
@@ -1689,6 +1795,9 @@ class CustomPanel(bpy.types.Panel):
         row.operator(ButtonOperatorExportSelectedVertex.bl_idname,
                      text="Exportar vértices selecionados", icon='WINDOW')
         row = layout.row()
+        row.operator(ButtonOperatorExportObjectCenter.bl_idname,
+                     text="Exportar centro objetos", icon='WINDOW')
+        row = layout.row()
         row.operator(ButtonOperatorUnwrapCylinder.bl_idname,
                      text="Unwrap cilindro", icon='MESH_CYLINDER')
 
@@ -1717,6 +1826,7 @@ _classes = [
     ButtonOperatorExportToClipboardFaceCenter,
     ButtonOperatorExportSelectedVertex,
     ButtonOperatorUnwrapCylinder,
+    ButtonOperatorExportObjectCenter,
     CustomPanel]
 
 def CreateArc(centro, raio, pontoInicial, pontoFinal):
