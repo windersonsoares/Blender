@@ -14,7 +14,7 @@ import enum
 bl_info = {
     "name": "ORC Tools",
     "author": "Winderson Soares Matos",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 80, 0),
     "location": "View3D > N",
     "description": "Ferramentas para orçamento",
@@ -705,7 +705,7 @@ class BODividirMeshPorNormal(bpy.types.Operator):
         return {'FINISHED'}
 
 class BODividirPorMaterial(bpy.types.Operator):
-    """Tooltip"""
+    """Divide os objetos selecionados pelos materiais aplicados"""
     bl_idname = "dividirpormaterial.0"
     bl_label = "Simple potato Operator"
 
@@ -743,21 +743,29 @@ class BODividirPorMaterial(bpy.types.Operator):
                 # Aplica a matriz de transformação
                 bm.transform(matrix)        
 
-            # Filtra as faces de acordo com o material
-            materials = obj.data.materials
+                # Filtra as faces de acordo com o material
+                materials = obj.data.materials
 
-            for f in bm.faces:
-                matIndex = f.material_index
-                if matIndex < len(materials):
-                    slot = obj.material_slots[f.material_index]
-                    mat = slot.material
-                    if mat is not None:
-                        # Verifica se o material já está no dicionário se não adiciona uma nova chave com o nome do mesmo
-                        if mat.name not in facesEMateriais:
-                            facesEMateriais[mat.name] = [f.index]
-                        
-                        # Calcula a área da face e adiciona ao material correspondente
-                        facesEMateriais[mat.name] += [f.index]
+                for f in bm.faces:
+                    matIndex = f.material_index
+                    if matIndex < len(materials):
+                        slot = obj.material_slots[f.material_index]
+                        mat = slot.material
+                        if mat is not None:
+                            # Verifica se o material já está no dicionário se não adiciona uma nova chave com o nome do mesmo
+                            if mat.name not in facesEMateriais:
+                                facesEMateriais[mat.name] = [f.index]
+                            
+                            # Calcula a área da face e adiciona ao material correspondente
+                            facesEMateriais[mat.name] += [f.index]
+                        else:
+                            # Verifica se o material já está no dicionário se não adiciona uma nova chave com o nome do mesmo
+                            if "Sem material" not in facesEMateriais:
+                                facesEMateriais["Sem material"] = [f.index]
+                            
+                            # Calcula a área da face e adiciona ao material correspondente
+                            facesEMateriais["Sem material"] += [f.index]
+                            print("Detectada face sem material aplicado")
                     else:
                         # Verifica se o material já está no dicionário se não adiciona uma nova chave com o nome do mesmo
                         if "Sem material" not in facesEMateriais:
@@ -765,26 +773,24 @@ class BODividirPorMaterial(bpy.types.Operator):
                         
                         # Calcula a área da face e adiciona ao material correspondente
                         facesEMateriais["Sem material"] += [f.index]
-                        print("Detectada face sem material aplicado")
-                else:
-                    # Verifica se o material já está no dicionário se não adiciona uma nova chave com o nome do mesmo
-                    if "Sem material" not in facesEMateriais:
-                        facesEMateriais["Sem material"] = [f.index]
-                    
-                    # Calcula a área da face e adiciona ao material correspondente
-                    facesEMateriais["Sem material"] += [f.index]
-                    print("Detectada face sem material aplicado")   
+                        print("Detectada face sem material aplicado")   
 
-            # Para cada face dividir criando novos objetos
-            for material, faces in facesEMateriais.items():
-                print(f"{material} com {len(faces)} faces")
-                novoObj = SepararFacesPeloIndice(obj, faces, material)
-                novosObj.append(novoObj)             
-                
+                # Para cada face dividir criando novos objetos
+                for material, faces in facesEMateriais.items():
+                    print(f"{material} com {len(faces)} faces")
+                    novoObj = SepararFacesPeloIndice(obj, faces, material)
+                    novosObj.append(novoObj)             
+                    
         # Verifique se está no modo de objeto (Object Mode)
         if bpy.context.object.mode != 'OBJECT':
             bpy.ops.object.mode_set(mode='OBJECT')
             
+        # Restora a seleção e remove os materiais dos elementos
+        for obj in novosObj:
+            obj.select_set(True)
+            
+        bpy.ops.object.material_slot_remove_unused()   
+
         # Atualiza a cena
         bpy.context.view_layer.update()
 
